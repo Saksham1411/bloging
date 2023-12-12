@@ -1,5 +1,6 @@
 const express = require('express');
-const User = require('../models/user')
+const User = require('../models/user');
+const { createTokenForUser } = require('../services/authentication');
 const router = express.Router();
 
 router.get("/signin", (req, res) => {
@@ -11,18 +12,30 @@ router.get("/signup", (req, res) => {
 
 router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    console.log(user);
-    if (!user) {
-        throw new Error('invalid credentials')
+    try {
+        const user = await User.findOne({ email });
+        console.log(user);
+        if (!user) {
+            throw new Error('invalid credentials')
+        }
+    
+        const isCorrect = await user.camparePassword(password);
+        if (!isCorrect) throw new Error('invalid password');
+        
+        const token = createTokenForUser(user);
+        // console.log("token",token);
+        return res.cookie("token",token).redirect("/");
+    } catch (err) {
+        res.render("signin",{
+            error:"Incorrect Email or Password",
+        })
+        return;
     }
 
-    const isCorrect = await user.camparePassword(password);
-    if (!isCorrect) throw new Error('invalid password');
+})
 
-    res.redirect("/");
-
+router.get('/logout',(req,res)=>{
+    res.clearCookie('token').redirect('/');
 })
 
 router.post('/signup', (req, res) => {
