@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head') %>
+  </head>
+  <body>
+    <%- include('./partials/Nav') %>
+
+    <div class="m-4 flex flex-col items-center">
+      <h1 class="font-bold text-4xl"><%= blog.title %></h1>
+      <img src="<%= blog.coverImageURL %>" alt="" class="w-1/2 my-4 center" />
+      <p class="text-lg self-start mx-4"><%= blog.body %></p>
+    </div>
+    <div class="m-4 flex items-center">
+      <img src="<%= blog.createdBy.profileImageURL %>" alt="" class="w-10" />
+      <span><%= blog.createdBy.fullName %></span>
+    </div>
+
+    
+
+    <h1 class="font-bold text-2xl m-4">Comments (<%= comments.length %>) </h1>
+    <div class="mx-4">
+      <% if (locals.user) { %>
+      <form action="/blog/comment/<%= blog._id %>" method="post">
+        <input
+          type="text"
+          name="content"
+          placeholder="Enter your comment"
+          class="border border-black rounded px-2 w-1/2 text-lg"
+        />
+        <button
+          type="submit"
+          class="mx-4 border border-black rounded px-3 text-lg"
+        >
+          Post
+        </button>
+      </form>
+      <% } %>
+
+      <div>
+        <% comments.forEach(comment => { %>
+          <div class="flex flex-col m-4 border-bottom-black">
+            <div class="flex items-center">
+              <img src="<%= comment.createdBy.profileImageURL %>" alt="" class="w-10" />
+            <span><%= comment.createdBy.fullName %></span>
+            </div>
+            <p class="ml-6"><%= comment.content %></p>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </body>
+</html>
